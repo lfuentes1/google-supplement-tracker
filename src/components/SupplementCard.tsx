@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Button } from '@/components/ui/button';
@@ -81,11 +80,6 @@ const SupplementCard = ({ supplement, onDelete, onUpdate, isChecked, onToggle }:
                            />
                             <div className="text-left flex-grow">
                                 <label htmlFor={`check-${supplement.id}`} className="font-semibold cursor-pointer">{supplement.name}</label>
-                                {supplement.servingSize && supplement.servingUnit && (
-                                    <p className="text-sm text-muted-foreground mt-1 font-normal">
-                                        {supplement.servingSize} {supplement.servingUnit}
-                                    </p>
-                                )}
                             </div>
                         </div>
                         <div className="flex items-center gap-1 flex-shrink-0">
@@ -100,35 +94,34 @@ const SupplementCard = ({ supplement, onDelete, onUpdate, isChecked, onToggle }:
                 </AccordionTrigger>
                 <AccordionContent className="p-4 pt-0">
                     <div className="space-y-4">
-                        <div>
-                            <h4 className="text-sm font-medium mb-2 text-muted-foreground">Serving Size</h4>
-                            <div className="flex items-center gap-2">
-                                <Input
-                                    type="number"
-                                    placeholder="Size"
-                                    value={supplement.servingSize ?? ''}
-                                    onChange={(e) => handleServingChange('servingSize', e.target.value === '' ? undefined : parseFloat(e.target.value))}
-                                    className="h-9 w-24"
-                                    step="0.1"
-                                />
-                                <Select
-                                    value={supplement.servingUnit ?? 'capsules'}
-                                    onValueChange={(value) => handleServingChange('servingUnit', value)}
-                                >
-                                    <SelectTrigger className="h-9 w-full max-w-[120px]">
-                                        <SelectValue placeholder="Unit" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="capsules">capsules</SelectItem>
-                                        <SelectItem value="tablets">tablets</SelectItem>
-                                        <SelectItem value="ml">ml</SelectItem>
-                                        <SelectItem value="g">g</SelectItem>
-                                        <SelectItem value="mg">mg</SelectItem>
-                                        <SelectItem value="mcg">mcg</SelectItem>
-                                        <SelectItem value="IU">IU</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </div>
+                        <div className="flex items-center gap-3">
+                            <label htmlFor={`serving-size-${supplement.id}`} className="text-sm font-medium text-muted-foreground whitespace-nowrap">Serving Size</label>
+                            <Input
+                                id={`serving-size-${supplement.id}`}
+                                type="number"
+                                placeholder="Size"
+                                value={supplement.servingSize ?? ''}
+                                onChange={(e) => handleServingChange('servingSize', e.target.value === '' ? undefined : parseFloat(e.target.value))}
+                                className="h-9 w-24"
+                                step="0.1"
+                            />
+                            <Select
+                                value={supplement.servingUnit ?? 'capsules'}
+                                onValueChange={(value) => handleServingChange('servingUnit', value)}
+                            >
+                                <SelectTrigger className="h-9 w-full max-w-[120px]">
+                                    <SelectValue placeholder="Unit" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="capsules">capsules</SelectItem>
+                                    <SelectItem value="tablets">tablets</SelectItem>
+                                    <SelectItem value="ml">ml</SelectItem>
+                                    <SelectItem value="g">g</SelectItem>
+                                    <SelectItem value="mg">mg</SelectItem>
+                                    <SelectItem value="mcg">mcg</SelectItem>
+                                    <SelectItem value="IU">IU</SelectItem>
+                                </SelectContent>
+                            </Select>
                         </div>
                         
                         <Separator />

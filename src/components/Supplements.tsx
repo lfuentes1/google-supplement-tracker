@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Pill } from "lucide-react";
 import {
@@ -31,7 +30,7 @@ export interface Supplement {
 interface SupplementsProps {
   supplements: Supplement[];
   activeSupplementIds: Set<string>;
-  onAddSupplement: (data: { supplementName: string; servingSize?: number; servingUnit?: string; frontOfContainer?: File; supplementLabel?: File }) => void;
+  onAddSupplement: (data: { supplementName: string; frontOfContainer?: File; supplementLabel?: File }) => void;
   onDeleteSupplement: (id: string) => void;
   onUpdateSupplement: (id: string, updatedSupplement: Supplement) => void;
   onToggleSupplement: (id: string, checked: boolean) => void;
