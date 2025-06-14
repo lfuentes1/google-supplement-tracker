@@ -22,7 +22,7 @@ const addSupplementFormSchema = z.object({
     message: "Supplement name is required.",
   }),
   frontOfContainer: z.any().optional(),
-  nutritionLabel: z.any().optional(),
+  supplementLabel: z.any().optional(),
 });
 
 type AddSupplementFormValues = z.infer<typeof addSupplementFormSchema>;
@@ -70,7 +70,7 @@ export function AddSupplementForm({ onAddSupplement }: { onAddSupplement: (data:
     fieldName,
   }: {
     label: string;
-    fieldName: "frontOfContainer" | "nutritionLabel";
+    fieldName: "frontOfContainer" | "supplementLabel";
   }) => {
     const fileInputRef = React.useRef<HTMLInputElement>(null);
     const file = form.watch(fieldName);
@@ -115,7 +115,7 @@ export function AddSupplementForm({ onAddSupplement }: { onAddSupplement: (data:
       <div className="w-full space-y-2">
         <Label>{label}</Label>
         <div
-          className={`relative flex flex-col items-center justify-center w-full h-24 border-2 border-dashed rounded-lg transition-colors
+          className={`relative flex flex-col items-center justify-center w-full h-20 sm:h-24 border-2 border-dashed rounded-lg transition-colors
             ${isLoading ? 'cursor-not-allowed bg-gray-50 dark:bg-gray-800/50' : 'cursor-pointer'}
             ${file && !isLoading ? 'border-green-500 bg-green-50 dark:bg-green-900/20' : ''}
             ${!file && !isLoading ? 'bg-card hover:bg-gray-100 dark:hover:bg-gray-800' : ''}
@@ -124,11 +124,11 @@ export function AddSupplementForm({ onAddSupplement }: { onAddSupplement: (data:
         >
           {isLoading ? (
             <div className="flex flex-col items-center justify-center text-center">
-              <Loader2 className="w-8 h-8 text-primary animate-spin" />
-              <p className="text-sm text-muted-foreground mt-2">Extracting name...</p>
+              <Loader2 className="w-6 h-6 sm:w-8 sm:h-8 text-primary animate-spin" />
+              <p className="text-xs sm:text-sm text-muted-foreground mt-2">Extracting name...</p>
             </div>
           ) : file ? (
-            <div className="flex items-center w-full h-full p-2 text-sm">
+            <div className="flex items-center w-full h-full p-2 text-xs sm:text-sm">
                 <div className="flex items-center gap-2 overflow-hidden flex-1">
                 {fieldName === 'frontOfContainer' ? <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0" /> : <FileText className="h-5 w-5 text-blue-500 flex-shrink-0" />}
                 <div className="truncate">
@@ -144,8 +144,8 @@ export function AddSupplementForm({ onAddSupplement }: { onAddSupplement: (data:
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center h-full text-center">
-              <UploadCloud className="w-8 h-8 text-gray-400" />
-              <p className="text-sm text-muted-foreground">Click to upload or drag & drop</p>
+              <UploadCloud className="w-6 h-6 sm:w-8 sm:h-8 text-gray-400" />
+              <p className="text-xs sm:text-sm text-muted-foreground mt-1">Click or drag & drop</p>
             </div>
           )}
           <input
@@ -175,7 +175,7 @@ export function AddSupplementForm({ onAddSupplement }: { onAddSupplement: (data:
             label="Front of Container"
             fieldName="frontOfContainer"
           />
-          <ImageDropzone label="Nutrition Label" fieldName="nutritionLabel" />
+          <ImageDropzone label="Supplement Label" fieldName="supplementLabel" />
         </div>
 
         <FormField
