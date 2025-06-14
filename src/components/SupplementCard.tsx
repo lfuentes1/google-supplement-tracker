@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Button } from '@/components/ui/button';
@@ -18,6 +19,10 @@ interface SupplementCardProps {
 }
 
 const SupplementCard = ({ supplement, onDelete, onUpdate, isChecked, onToggle }: SupplementCardProps) => {
+
+    const handleServingChange = (field: 'servingSize' | 'servingUnit', value: string | number | undefined) => {
+        onUpdate(supplement.id, { ...supplement, [field]: value });
+    };
 
     const handleFactChange = (factId: string, field: keyof Omit<NutritionFact, 'id'>, value: string | number) => {
         const updatedFacts = supplement.nutritionFacts.map(fact =>
@@ -63,22 +68,45 @@ const SupplementCard = ({ supplement, onDelete, onUpdate, isChecked, onToggle }:
         <Accordion type="single" collapsible className="w-full bg-card border rounded-lg">
             <AccordionItem value={supplement.id} className="border-b-0">
                 <AccordionTrigger className="p-4 hover:no-underline">
-                    <div className="flex items-center justify-between w-full">
-                        <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+                    <div className="flex items-start justify-between w-full gap-4">
+                        <div className="flex items-start gap-3 flex-grow" onClick={(e) => e.stopPropagation()}>
                            <Checkbox
                                 id={`check-${supplement.id}`}
                                 checked={isChecked}
                                 onCheckedChange={(checked) => {
                                     onToggle(supplement.id, checked === true);
                                 }}
+                                className="mt-1"
                            />
-                            <div className="text-left pr-2">
+                            <div className="text-left flex-grow">
                                 <label htmlFor={`check-${supplement.id}`} className="font-semibold cursor-pointer">{supplement.name}</label>
-                                {supplement.servingSize && supplement.servingUnit && (
-                                    <p className="text-sm text-muted-foreground">
-                                        Serving: {supplement.servingSize} {supplement.servingUnit}
-                                    </p>
-                                )}
+                                <div className="flex items-center gap-2 mt-2">
+                                    <Input
+                                        type="number"
+                                        placeholder="Size"
+                                        value={supplement.servingSize ?? ''}
+                                        onChange={(e) => handleServingChange('servingSize', e.target.value === '' ? undefined : parseFloat(e.target.value))}
+                                        className="h-8 w-24 text-sm"
+                                        step="0.1"
+                                    />
+                                    <Select
+                                        value={supplement.servingUnit ?? 'capsules'}
+                                        onValueChange={(value) => handleServingChange('servingUnit', value)}
+                                    >
+                                        <SelectTrigger className="h-8 w-full max-w-[120px] text-sm">
+                                            <SelectValue placeholder="Unit" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="capsules">capsules</SelectItem>
+                                            <SelectItem value="tablets">tablets</SelectItem>
+                                            <SelectItem value="ml">ml</SelectItem>
+                                            <SelectItem value="g">g</SelectItem>
+                                            <SelectItem value="mg">mg</SelectItem>
+                                            <SelectItem value="mcg">mcg</SelectItem>
+                                            <SelectItem value="IU">IU</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
                             </div>
                         </div>
                         <div className="flex items-center gap-1 flex-shrink-0">
