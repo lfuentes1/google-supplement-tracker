@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Button } from '@/components/ui/button';
@@ -8,7 +9,6 @@ import { Supplement, NutritionFact } from './Supplements';
 import { toast } from 'sonner';
 import { Checkbox } from "@/components/ui/checkbox";
 import { NutritionFactCombobox } from './NutritionFactCombobox';
-import { Separator } from '@/components/ui/separator';
 
 interface SupplementCardProps {
     supplement: Supplement;
@@ -124,10 +124,7 @@ const SupplementCard = ({ supplement, onDelete, onUpdate, isChecked, onToggle }:
                             </Select>
                         </div>
                         
-                        <Separator />
-
                         <div>
-                            <h4 className="text-sm font-medium mb-2 text-muted-foreground">Nutrition Facts</h4>
                             <div className="space-y-3">
                                 {supplement.nutritionFacts.length > 0 ? (
                                     supplement.nutritionFacts.map(fact => (
