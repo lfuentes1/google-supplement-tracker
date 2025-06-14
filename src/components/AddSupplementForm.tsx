@@ -1,4 +1,3 @@
-
 import * as React from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -192,6 +191,20 @@ export function AddSupplementForm({ onAddSupplement }: { onAddSupplement: (data:
           <ImageDropzone label="Supplement Label" fieldName="supplementLabel" />
         </div>
 
+        <FormField
+          control={form.control}
+          name="supplementName"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Supplement Name</FormLabel>
+              <FormControl>
+                <Input placeholder="e.g., multivitamin" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <FormField
                 control={form.control}
@@ -237,20 +250,6 @@ export function AddSupplementForm({ onAddSupplement }: { onAddSupplement: (data:
                 )}
             />
         </div>
-
-        <FormField
-          control={form.control}
-          name="supplementName"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Supplement Name</FormLabel>
-              <FormControl>
-                <Input placeholder="e.g., multivitamin" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
 
         <Button type="submit" disabled={!supplementNameValue || isExtracting || isSubmitting} className="w-full">
           {isExtracting ? (
