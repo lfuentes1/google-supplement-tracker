@@ -7,6 +7,7 @@ import { Sparkles, X, Plus } from 'lucide-react';
 import { Supplement, NutritionFact } from './Supplements';
 import { toast } from 'sonner';
 import { Checkbox } from "@/components/ui/checkbox";
+import { NutritionFactCombobox } from './NutritionFactCombobox';
 
 interface SupplementCardProps {
     supplement: Supplement;
@@ -71,7 +72,14 @@ const SupplementCard = ({ supplement, onDelete, onUpdate, isChecked, onToggle }:
                                     onToggle(supplement.id, checked === true);
                                 }}
                            />
-                           <label htmlFor={`check-${supplement.id}`} className="font-semibold text-left pr-2 cursor-pointer">{supplement.name}</label>
+                            <div className="text-left pr-2">
+                                <label htmlFor={`check-${supplement.id}`} className="font-semibold cursor-pointer">{supplement.name}</label>
+                                {supplement.servingSize && supplement.servingUnit && (
+                                    <p className="text-sm text-muted-foreground">
+                                        Serving: {supplement.servingSize} {supplement.servingUnit}
+                                    </p>
+                                )}
+                            </div>
                         </div>
                         <div className="flex items-center gap-1 flex-shrink-0">
                             <Button variant="ghost" size="icon" className="text-purple-500 hover:bg-purple-100 hover:text-purple-600 h-8 w-8" onClick={(e) => { e.stopPropagation(); handleIntelliAdd(); }}>
@@ -88,10 +96,9 @@ const SupplementCard = ({ supplement, onDelete, onUpdate, isChecked, onToggle }:
                         {supplement.nutritionFacts.length > 0 ? (
                             supplement.nutritionFacts.map(fact => (
                             <div key={fact.id} className="grid grid-cols-[1fr,auto,auto,auto] gap-2 items-center">
-                                <Input
-                                    placeholder="e.g. Vitamin C"
+                                <NutritionFactCombobox
                                     value={fact.name}
-                                    onChange={(e) => handleFactChange(fact.id, 'name', e.target.value)}
+                                    onChange={(value) => handleFactChange(fact.id, 'name', value)}
                                 />
                                 <Input
                                     type="number"
@@ -99,6 +106,7 @@ const SupplementCard = ({ supplement, onDelete, onUpdate, isChecked, onToggle }:
                                     value={fact.amount}
                                     onChange={(e) => handleFactChange(fact.id, 'amount', e.target.value ? parseFloat(e.target.value) : '')}
                                     className="w-24"
+                                    step="0.05"
                                 />
                                 <Select value={fact.unit} onValueChange={(value) => handleFactChange(fact.id, 'unit', value)}>
                                     <SelectTrigger className="w-28">
@@ -113,7 +121,7 @@ const SupplementCard = ({ supplement, onDelete, onUpdate, isChecked, onToggle }:
                                         <SelectItem value="tablets">tablets</SelectItem>
                                     </SelectContent>
                                 </Select>
-                                <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground" onClick={() => handleDeleteFact(fact.id)}>
+                                <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:bg-destructive/10" onClick={() => handleDeleteFact(fact.id)}>
                                     <X className="h-4 w-4" />
                                 </Button>
                             </div>
@@ -121,10 +129,11 @@ const SupplementCard = ({ supplement, onDelete, onUpdate, isChecked, onToggle }:
                         ) : (
                             <p className="text-sm text-muted-foreground text-center py-2">No nutrition facts added yet. Use IntelliAdd or add one manually.</p>
                         )}
-                         <Button variant="outline" size="sm" onClick={handleAddFact} className="mt-2 w-full">
-                            <Plus className="mr-2 h-4 w-4" />
-                            Add Nutrition Fact
-                        </Button>
+                        <div className="flex justify-start mt-2">
+                             <Button variant="ghost" size="icon" onClick={handleAddFact} className="text-primary hover:bg-primary/10">
+                                <Plus className="h-5 w-5" />
+                            </Button>
+                        </div>
                     </div>
                 </AccordionContent>
             </AccordionItem>

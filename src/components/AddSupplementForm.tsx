@@ -16,11 +16,14 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { UploadCloud, CheckCircle, FileText, X, Loader2 } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const addSupplementFormSchema = z.object({
   supplementName: z.string().min(1, {
     message: "Supplement name is required.",
   }),
+  servingSize: z.preprocess((val) => (val === "" ? undefined : val), z.coerce.number({invalid_type_error: "Must be a number"}).positive("Must be positive").optional()),
+  servingUnit: z.string().optional(),
   frontOfContainer: z.any().optional(),
   supplementLabel: z.any().optional(),
 });
@@ -60,6 +63,7 @@ export function AddSupplementForm({ onAddSupplement }: { onAddSupplement: (data:
     resolver: zodResolver(addSupplementFormSchema),
     defaultValues: {
       supplementName: "",
+      servingUnit: "capsules",
     },
     mode: "onChange",
   });
@@ -186,6 +190,52 @@ export function AddSupplementForm({ onAddSupplement }: { onAddSupplement: (data:
             fieldName="frontOfContainer"
           />
           <ImageDropzone label="Supplement Label" fieldName="supplementLabel" />
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <FormField
+                control={form.control}
+                name="servingSize"
+                render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>Serving Size</FormLabel>
+                        <FormControl>
+                            <Input 
+                                type="number" 
+                                placeholder="e.g., 2" 
+                                {...field} 
+                                step="0.1"
+                                value={field.value ?? ''}
+                                onChange={event => field.onChange(event.target.value)}
+                            />
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                )}
+            />
+            <FormField
+                control={form.control}
+                name="servingUnit"
+                render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>Unit</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select a unit" />
+                                </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                                <SelectItem value="capsules">capsules</SelectItem>
+                                <SelectItem value="tablets">tablets</SelectItem>
+                                <SelectItem value="ml">ml</SelectItem>
+                                <SelectItem value="g">g</SelectItem>
+                            </SelectContent>
+                        </Select>
+                        <FormMessage />
+                    </FormItem>
+                )}
+            />
         </div>
 
         <FormField

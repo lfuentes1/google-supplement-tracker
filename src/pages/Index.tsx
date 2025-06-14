@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import Supplements from "@/components/Supplements";
 import type { Supplement } from "@/components/Supplements";
@@ -8,10 +9,12 @@ const Index = () => {
   const [supplements, setSupplements] = useState<Supplement[]>([]);
   const [activeSupplementIds, setActiveSupplementIds] = useState<Set<string>>(new Set());
 
-  const handleAddSupplement = (data: { supplementName: string; frontOfContainer?: File; supplementLabel?: File }) => {
+  const handleAddSupplement = (data: { supplementName: string; servingSize?: number; servingUnit?: string; frontOfContainer?: File; supplementLabel?: File }) => {
     const newSupplement: Supplement = {
       id: Date.now().toString(),
       name: data.supplementName,
+      servingSize: data.servingSize,
+      servingUnit: data.servingUnit,
       frontOfContainer: data.frontOfContainer,
       supplementLabel: data.supplementLabel,
       nutritionFacts: [],

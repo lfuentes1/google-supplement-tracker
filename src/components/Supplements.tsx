@@ -21,6 +21,8 @@ export interface NutritionFact {
 export interface Supplement {
   id: string;
   name: string;
+  servingSize?: number;
+  servingUnit?: string;
   frontOfContainer?: File;
   supplementLabel?: File;
   nutritionFacts: NutritionFact[];
@@ -29,7 +31,7 @@ export interface Supplement {
 interface SupplementsProps {
   supplements: Supplement[];
   activeSupplementIds: Set<string>;
-  onAddSupplement: (data: { supplementName: string; frontOfContainer?: File; supplementLabel?: File }) => void;
+  onAddSupplement: (data: { supplementName: string; servingSize?: number; servingUnit?: string; frontOfContainer?: File; supplementLabel?: File }) => void;
   onDeleteSupplement: (id: string) => void;
   onUpdateSupplement: (id: string, updatedSupplement: Supplement) => void;
   onToggleSupplement: (id: string, checked: boolean) => void;
