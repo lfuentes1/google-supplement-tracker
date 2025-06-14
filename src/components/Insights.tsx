@@ -17,45 +17,48 @@ const Insights = () => {
   ];
 
   return (
-    <Card className="h-full">
-      <CardContent className="p-6 space-y-4">
-        <Collapsible open={promptsOpen} onOpenChange={setPromptsOpen} className="border rounded-lg">
-          <CollapsibleTrigger className="flex justify-between items-center w-full p-4 font-semibold text-lg hover:bg-gray-100 rounded-t-lg transition-colors">
-            <div className="flex items-center gap-2">
-              <Sparkles className="h-5 w-5 text-primary" />
-              <span>IntelliPrompts</span>
-            </div>
-            {promptsOpen ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
-          </CollapsibleTrigger>
-          <CollapsibleContent className="p-4 space-y-4 border-t">
-            <Textarea placeholder="Questions or Commands" />
-            <div className="grid grid-cols-2 gap-2">
-              <Button variant="outline" className="text-xs h-auto py-2 whitespace-normal">Recalls for My Supplements?</Button>
-              <Button variant="outline" className="text-xs h-auto py-2 whitespace-normal">Give me absorption tips.</Button>
-              <Button variant="outline" className="text-xs h-auto py-2 whitespace-normal">Recommend Brands, please.</Button>
-              <Button variant="outline" className="text-xs h-auto py-2 whitespace-normal">Always use IntelliAdd.</Button>
-            </div>
-          </CollapsibleContent>
-        </Collapsible>
-
-        <Collapsible open={noticesOpen} onOpenChange={setNoticesOpen} className="border rounded-lg">
-          <CollapsibleTrigger className="flex justify-between items-center w-full p-4 font-semibold text-lg hover:bg-gray-100 rounded-t-lg transition-colors">
-            <div className="flex items-center gap-2">
-              <Sparkles className="h-5 w-5 text-purple-600" />
-              <span>IntelliNotices</span>
-            </div>
-            {noticesOpen ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
-          </CollapsibleTrigger>
-          <CollapsibleContent className="p-4 space-y-2 border-t text-sm">
-            {notices.map((notice, index) => (
-              <div key={index} className="border-b last:border-b-0 py-2 first:pt-0 last:pb-0">
-                <p><span className="font-semibold">{new Date(notice.date).toLocaleDateString('en-US')}:</span> {notice.text}</p>
+    <div className="space-y-4">
+      <h2 className="text-2xl font-bold text-gray-800">Insights</h2>
+      <Card className="h-full">
+        <CardContent className="p-6 space-y-4">
+          <Collapsible open={promptsOpen} onOpenChange={setPromptsOpen} className="border rounded-lg">
+            <CollapsibleTrigger className="flex justify-between items-center w-full p-4 font-semibold text-lg hover:bg-gray-100 rounded-t-lg transition-colors">
+              <div className="flex items-center gap-2">
+                <Sparkles className="h-5 w-5 text-primary" />
+                <span>IntelliPrompts</span>
               </div>
-            ))}
-          </CollapsibleContent>
-        </Collapsible>
-      </CardContent>
-    </Card>
+              {promptsOpen ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
+            </CollapsibleTrigger>
+            <CollapsibleContent className="p-4 space-y-4 border-t">
+              <Textarea placeholder="Questions or Commands" />
+              <div className="grid grid-cols-2 gap-2">
+                <Button variant="outline" className="text-xs h-auto py-2 whitespace-normal">Recalls for My Supplements?</Button>
+                <Button variant="outline" className="text-xs h-auto py-2 whitespace-normal">Give me absorption tips.</Button>
+                <Button variant="outline" className="text-xs h-auto py-2 whitespace-normal">Recommend Brands, please.</Button>
+                <Button variant="outline" className="text-xs h-auto py-2 whitespace-normal">Always use IntelliAdd.</Button>
+              </div>
+            </CollapsibleContent>
+          </Collapsible>
+
+          <Collapsible open={noticesOpen} onOpenChange={setNoticesOpen} className="border rounded-lg">
+            <CollapsibleTrigger className="flex justify-between items-center w-full p-4 font-semibold text-lg hover:bg-gray-100 rounded-t-lg transition-colors">
+              <div className="flex items-center gap-2">
+                <Sparkles className="h-5 w-5 text-purple-600" />
+                <span>IntelliNotices</span>
+              </div>
+              {noticesOpen ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
+            </CollapsibleTrigger>
+            <CollapsibleContent className="p-4 space-y-2 border-t text-sm">
+              {notices.map((notice, index) => (
+                <div key={index} className="border-b last:border-b-0 py-2 first:pt-0 last:pb-0">
+                  <p><span className="font-semibold">{new Date(notice.date).toLocaleDateString('en-US')}:</span> {notice.text}</p>
+                </div>
+              ))}
+            </CollapsibleContent>
+          </Collapsible>
+        </CardContent>
+      </Card>
+    </div>
   );
 };
 
