@@ -1,4 +1,3 @@
-
 import * as React from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -36,7 +35,7 @@ const getSupplementNameFromImage = async (file: File): Promise<string> => {
   return "Premium Multivitamin";
 };
 
-export function AddSupplementForm() {
+export function AddSupplementForm({ onAddSupplement }: { onAddSupplement: (data: AddSupplementFormValues) => void }) {
   const form = useForm<AddSupplementFormValues>({
     resolver: zodResolver(addSupplementFormSchema),
     defaultValues: {
@@ -91,8 +90,8 @@ export function AddSupplementForm() {
   };
 
   function onSubmit(data: AddSupplementFormValues) {
-    console.log("Supplement Added:", data);
-    toast.success("Supplement added successfully!");
+    toast.success(`${data.supplementName} added to your list!`);
+    onAddSupplement(data);
     form.reset();
   }
 
