@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Supplement } from './Supplements';
@@ -7,11 +6,13 @@ import { Search } from 'lucide-react';
 
 interface MySupplementsProps {
     supplements: Supplement[];
+    activeSupplementIds: Set<string>;
     onDelete: (id: string) => void;
     onUpdate: (id: string, updatedSupplement: Supplement) => void;
+    onToggle: (id: string, checked: boolean) => void;
 }
 
-const MySupplements = ({ supplements, onDelete, onUpdate }: MySupplementsProps) => {
+const MySupplements = ({ supplements, activeSupplementIds, onDelete, onUpdate, onToggle }: MySupplementsProps) => {
     const [searchTerm, setSearchTerm] = useState('');
 
     const filteredSupplements = supplements.filter(supplement => {
@@ -46,6 +47,8 @@ const MySupplements = ({ supplements, onDelete, onUpdate }: MySupplementsProps) 
                         supplement={supplement}
                         onDelete={onDelete}
                         onUpdate={onUpdate}
+                        isChecked={activeSupplementIds.has(supplement.id)}
+                        onToggle={onToggle}
                     />
                 ))}
             </div>

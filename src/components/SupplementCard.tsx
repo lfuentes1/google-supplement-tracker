@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Button } from '@/components/ui/button';
@@ -7,14 +6,17 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Sparkles, X, Plus } from 'lucide-react';
 import { Supplement, NutritionFact } from './Supplements';
 import { toast } from 'sonner';
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface SupplementCardProps {
     supplement: Supplement;
     onDelete: (id: string) => void;
     onUpdate: (id: string, updatedSupplement: Supplement) => void;
+    isChecked: boolean;
+    onToggle: (id: string, checked: boolean) => void;
 }
 
-const SupplementCard = ({ supplement, onDelete, onUpdate }: SupplementCardProps) => {
+const SupplementCard = ({ supplement, onDelete, onUpdate, isChecked, onToggle }: SupplementCardProps) => {
 
     const handleFactChange = (factId: string, field: keyof Omit<NutritionFact, 'id'>, value: string | number) => {
         const updatedFacts = supplement.nutritionFacts.map(fact =>
@@ -61,7 +63,16 @@ const SupplementCard = ({ supplement, onDelete, onUpdate }: SupplementCardProps)
             <AccordionItem value={supplement.id} className="border-b-0">
                 <AccordionTrigger className="p-4 hover:no-underline">
                     <div className="flex items-center justify-between w-full">
-                        <span className="font-semibold text-left pr-2">{supplement.name}</span>
+                        <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+                           <Checkbox
+                                id={`check-${supplement.id}`}
+                                checked={isChecked}
+                                onCheckedChange={(checked) => {
+                                    onToggle(supplement.id, checked === true);
+                                }}
+                           />
+                           <label htmlFor={`check-${supplement.id}`} className="font-semibold text-left pr-2 cursor-pointer">{supplement.name}</label>
+                        </div>
                         <div className="flex items-center gap-1 flex-shrink-0">
                             <Button variant="ghost" size="icon" className="text-purple-500 hover:bg-purple-100 hover:text-purple-600 h-8 w-8" onClick={(e) => { e.stopPropagation(); handleIntelliAdd(); }}>
                                 <Sparkles className="h-4 w-4" />
