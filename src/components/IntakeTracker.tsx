@@ -1,12 +1,16 @@
-
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ClipboardList, ChevronUp, ChevronDown } from "lucide-react";
+import { ClipboardList, ChevronUp, ChevronDown, CalendarIcon } from "lucide-react";
 import { Supplement } from "./Supplements";
 import { dailyValues, DailyValue } from "@/data/dailyValues";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
+import { format } from "date-fns";
+import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import { Switch } from "@/components/ui/switch";
 
 interface IntakeTrackerProps {
   supplements: Supplement[];
@@ -63,10 +67,12 @@ const NutrientTable = ({ nutrients, category }: { nutrients: NutrientData[], cat
 
 
 const IntakeTracker = ({ supplements, activeSupplementIds }: IntakeTrackerProps) => {
+    const [date, setDate] = useState<Date | undefined>(new Date());
+    const [intakeEnabled, setIntakeEnabled] = useState(false);
     const [activeOpen, setActiveOpen] = useState(true);
     const [insufficientOpen, setInsufficientOpen] = useState(true);
 
-    const activeSupplements = supplements.filter(s => activeSupplementIds.has(s.id));
+    const activeSupplements = intakeEnabled ? supplements.filter(s => activeSupplementIds.has(s.id)) : [];
 
     const aggregatedIntake = activeSupplements
         .flatMap(s => s.nutritionFacts)
@@ -108,6 +114,35 @@ const IntakeTracker = ({ supplements, activeSupplementIds }: IntakeTrackerProps)
                 </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
+                <div className="flex items-center justify-center gap-4 py-4 border-b">
+                    <Popover>
+                        <PopoverTrigger asChild>
+                            <Button
+                                variant={"outline"}
+                                className={cn(
+                                    "w-auto justify-start text-left font-normal",
+                                    !date && "text-muted-foreground"
+                                )}
+                            >
+                                <CalendarIcon className="mr-2 h-4 w-4" />
+                                {date ? format(date, "PPP") : <span>Pick a date</span>}
+                            </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0">
+                            <Calendar
+                                mode="single"
+                                selected={date}
+                                onSelect={setDate}
+                                initialFocus
+                            />
+                        </PopoverContent>
+                    </Popover>
+                    <Switch
+                        checked={intakeEnabled}
+                        onCheckedChange={setIntakeEnabled}
+                    />
+                </div>
+
                 <Collapsible open={activeOpen} onOpenChange={setActiveOpen} className="border rounded-lg">
                     <CollapsibleTrigger className="flex justify-between items-center w-full p-4 font-semibold text-lg bg-green-100 text-green-800 rounded-t-lg hover:bg-green-200/70 transition-colors">
                         <span>Active Vitamins & Minerals ({activeNutrients.length})</span>
@@ -120,7 +155,7 @@ const IntakeTracker = ({ supplements, activeSupplementIds }: IntakeTrackerProps)
                                 <NutrientTable nutrients={activeNutrients} category="Minerals" />
                             </>
                         ) : (
-                            <p className="text-sm text-muted-foreground text-center py-2">Select supplements to see active nutrients.</p>
+                            <p className="text-sm text-muted-foreground text-center py-2">{intakeEnabled ? "Select supplements to see active nutrients." : "Enable daily intake to see active nutrients."}</p>
                         )}
                     </CollapsibleContent>
                 </Collapsible>
