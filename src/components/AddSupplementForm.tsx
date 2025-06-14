@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { UploadCloud, FileText } from "lucide-react";
+import { UploadCloud, FileText, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const addSupplementFormSchema = z.object({
@@ -34,7 +34,7 @@ const getSupplementNameFromImage = async (file: File): Promise<string> => {
   console.log("Simulating OCR on file:", file.name);
   // In a real app, you would use an OCR service here.
   // For this demo, we'll parse the filename after a short delay.
-  await new Promise((resolve) => setTimeout(resolve, 500));
+  await new Promise((resolve) => setTimeout(resolve, 1500));
 
   // Remove the file extension
   let name = file.name.split('.').slice(0, -1).join('.') || file.name;
@@ -51,7 +51,8 @@ const getSupplementNameFromImage = async (file: File): Promise<string> => {
     .split(' ')
     .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
     .join(' ');
-
+  
+  console.log("Extracted name:", capitalizedName);
   return capitalizedName || "Could not determine name";
 };
 
@@ -73,21 +74,26 @@ export function AddSupplementForm({ onAddSupplement }: { onAddSupplement: (data:
     label: string;
     fieldName: "frontOfContainer" | "nutritionLabel";
   }) => {
+    const [isExtracting, setIsExtracting] = React.useState(false);
     const fileInputRef = React.useRef<HTMLInputElement>(null);
     const file = form.watch(fieldName);
 
     const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
       if (e.target.files && e.target.files.length > 0) {
-        const file = e.target.files[0];
-        form.setValue(fieldName, file, { shouldValidate: true });
+        const selectedFile = e.target.files[0];
+        form.setValue(fieldName, selectedFile, { shouldValidate: true });
+
         if (fieldName === "frontOfContainer") {
+          setIsExtracting(true);
           toast.info("Extracting supplement name from image...");
           try {
-            const name = await getSupplementNameFromImage(file);
+            const name = await getSupplementNameFromImage(selectedFile);
             form.setValue("supplementName", name, { shouldValidate: true });
             toast.success("Supplement name populated!");
           } catch (error) {
             toast.error("Could not extract name from image.");
+          } finally {
+            setIsExtracting(false);
           }
         }
       }
@@ -98,14 +104,22 @@ export function AddSupplementForm({ onAddSupplement }: { onAddSupplement: (data:
         <Label>{label}</Label>
         <div
           className={cn(
-            "flex flex-col items-center justify-center w-full h-24 border-2 border-dashed rounded-lg cursor-pointer bg-card hover:bg-gray-100 dark:hover:bg-gray-800",
+            "flex flex-col items-center justify-center w-full h-24 border-2 border-dashed rounded-lg cursor-pointer bg-card transition-colors",
             {
-              "border-primary": file,
+              "border-primary": file && !isExtracting,
+              "border-yellow-500": isExtracting,
+              "cursor-not-allowed hover:bg-card": isExtracting,
+              "hover:bg-gray-100 dark:hover:bg-gray-800": !isExtracting,
             }
           )}
-          onClick={() => fileInputRef.current?.click()}
+          onClick={() => !isExtracting && fileInputRef.current?.click()}
         >
-          {file ? (
+          {isExtracting ? (
+            <div className="flex flex-col items-center gap-2 p-2 text-sm text-foreground">
+              <Loader2 className="h-8 w-8 animate-spin text-yellow-500" />
+              <p className="text-sm text-muted-foreground">Extracting name...</p>
+            </div>
+          ) : file ? (
             <div className="flex items-center gap-2 p-2 text-sm text-foreground">
               <FileText className="h-6 w-6 text-primary" />
               <span className="truncate max-w-40">{file.name}</span>
@@ -123,6 +137,7 @@ export function AddSupplementForm({ onAddSupplement }: { onAddSupplement: (data:
             className="hidden"
             accept="image/*"
             onChange={handleFileChange}
+            disabled={isExtracting}
           />
         </div>
       </div>
