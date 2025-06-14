@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Button } from '@/components/ui/button';
@@ -162,10 +161,9 @@ const SupplementCard = ({ supplement, onDelete, onUpdate, isChecked, onToggle }:
                                 ) : (
                                     <p className="text-sm text-muted-foreground text-center py-2">No nutrition facts added yet. Use IntelliAdd or add one manually.</p>
                                 )}
-                                <div className="flex justify-start">
-                                     <Button variant="outline" size="sm" onClick={handleAddFact} className="mt-2">
-                                        <Plus className="mr-2 h-4 w-4" />
-                                        Add Fact
+                                <div className="flex justify-center">
+                                     <Button size="icon" onClick={handleAddFact} className="mt-2 h-8 w-8 rounded-full bg-blue-500 text-white hover:bg-blue-600">
+                                        <Plus className="h-4 w-4" />
                                     </Button>
                                 </div>
                             </div>
