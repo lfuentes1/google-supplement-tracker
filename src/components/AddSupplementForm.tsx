@@ -54,6 +54,7 @@ const getSupplementNameFromImage = async (file: File): Promise<string> => {
 
 export function AddSupplementForm({ onAddSupplement }: { onAddSupplement: (data: AddSupplementFormValues) => void }) {
   const [isExtracting, setIsExtracting] = React.useState(false);
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
 
   const form = useForm<AddSupplementFormValues>({
     resolver: zodResolver(addSupplementFormSchema),
@@ -161,10 +162,19 @@ export function AddSupplementForm({ onAddSupplement }: { onAddSupplement: (data:
     );
   };
 
-  function onSubmit(data: AddSupplementFormValues) {
-    toast.success(`${data.supplementName} added to your list!`);
-    onAddSupplement(data);
-    form.reset();
+  async function onSubmit(data: AddSupplementFormValues) {
+    setIsSubmitting(true);
+    try {
+      // Simulate a short delay for submission
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      toast.success(`${data.supplementName} added to your list!`);
+      onAddSupplement(data);
+      form.reset();
+    } catch (error) {
+      toast.error("Failed to add supplement.");
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -192,11 +202,16 @@ export function AddSupplementForm({ onAddSupplement }: { onAddSupplement: (data:
           )}
         />
 
-        <Button type="submit" disabled={!supplementNameValue || isExtracting} className="w-full">
+        <Button type="submit" disabled={!supplementNameValue || isExtracting || isSubmitting} className="w-full">
           {isExtracting ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Processing...
+              Extracting name...
+            </>
+          ) : isSubmitting ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Adding Supplement...
             </>
           ) : (
             "Add Supplement"
