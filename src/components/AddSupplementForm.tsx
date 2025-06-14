@@ -1,3 +1,4 @@
+
 import * as React from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -14,7 +15,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { UploadCloud } from "lucide-react";
+import { UploadCloud, CheckCircle, FileText, X, Loader2 } from "lucide-react";
 
 const addSupplementFormSchema = z.object({
   supplementName: z.string().min(1, {
@@ -30,12 +31,30 @@ type AddSupplementFormValues = z.infer<typeof addSupplementFormSchema>;
 const getSupplementNameFromImage = async (file: File): Promise<string> => {
   console.log("Simulating OCR on file:", file.name);
   // In a real app, you would use an OCR service here.
-  // For this demo, we'll return a mock name after a short delay.
-  await new Promise((resolve) => setTimeout(resolve, 500));
-  return "Premium Multivitamin";
+  // For this demo, we'll parse the filename to get a name.
+  await new Promise((resolve) => setTimeout(resolve, 1500)); // Simulate network latency
+
+  const nameWithoutExtension = file.name.split('.').slice(0, -1).join('.') || file.name;
+  
+  const cleanedName = nameWithoutExtension
+    .replace(/_/g, ' ') // replace underscores with spaces
+    .replace(/-/g, ' ') // replace hyphens with spaces
+    .replace(/\b(front|label|container|image|img|pic)\b/gi, '') // remove common keywords
+    .trim();
+
+  // Capitalize first letter of each word
+  const finalName = cleanedName
+    .split(' ')
+    .filter(Boolean) // remove empty strings from double spaces
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ');
+
+  return finalName || "Unknown Supplement";
 };
 
 export function AddSupplementForm({ onAddSupplement }: { onAddSupplement: (data: AddSupplementFormValues) => void }) {
+  const [isExtracting, setIsExtracting] = React.useState(false);
+
   const form = useForm<AddSupplementFormValues>({
     resolver: zodResolver(addSupplementFormSchema),
     defaultValues: {
@@ -54,35 +73,88 @@ export function AddSupplementForm({ onAddSupplement }: { onAddSupplement: (data:
     fieldName: "frontOfContainer" | "nutritionLabel";
   }) => {
     const fileInputRef = React.useRef<HTMLInputElement>(null);
+    const file = form.watch(fieldName);
 
     const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
       if (e.target.files && e.target.files.length > 0) {
-        const file = e.target.files[0];
-        form.setValue(fieldName, file);
+        const selectedFile = e.target.files[0];
+        form.setValue(fieldName, selectedFile, { shouldValidate: true });
+        toast.success(`${selectedFile.name} selected.`);
+        
         if (fieldName === "frontOfContainer") {
+          setIsExtracting(true);
           toast.info("Extracting supplement name from image...");
-          const name = await getSupplementNameFromImage(file);
-          form.setValue("supplementName", name, { shouldValidate: true });
-          toast.success("Supplement name populated!");
+          try {
+            const name = await getSupplementNameFromImage(selectedFile);
+            form.setValue("supplementName", name, { shouldValidate: true });
+            toast.success(`Supplement name populated: ${name}`);
+          } catch (error) {
+            toast.error("Could not extract supplement name.");
+          } finally {
+            setIsExtracting(false);
+          }
         }
       }
     };
+
+    const handleClearFile = (e: React.MouseEvent) => {
+      e.stopPropagation(); // prevent opening file dialog
+      form.setValue(fieldName, undefined, { shouldValidate: true });
+      if (fieldName === 'frontOfContainer') {
+        form.setValue('supplementName', '', { shouldValidate: true });
+      }
+      toast.info('File removed.');
+      if(fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    };
+
+    const isLoading = fieldName === 'frontOfContainer' && isExtracting;
 
     return (
       <div className="w-full space-y-2">
         <Label>{label}</Label>
         <div
-          className="flex flex-col items-center justify-center w-full h-24 border-2 border-dashed rounded-lg cursor-pointer bg-card hover:bg-gray-100 dark:hover:bg-gray-800"
-          onClick={() => fileInputRef.current?.click()}
+          className={`relative flex flex-col items-center justify-center w-full h-24 border-2 border-dashed rounded-lg transition-colors
+            ${isLoading ? 'cursor-not-allowed bg-gray-50 dark:bg-gray-800/50' : 'cursor-pointer'}
+            ${file && !isLoading ? 'border-green-500 bg-green-50 dark:bg-green-900/20' : ''}
+            ${!file && !isLoading ? 'bg-card hover:bg-gray-100 dark:hover:bg-gray-800' : ''}
+          `}
+          onClick={() => !isLoading && fileInputRef.current?.click()}
         >
-          <UploadCloud className="w-8 h-8 text-gray-400" />
-          <p className="text-sm text-muted-foreground">or drag & drop</p>
+          {isLoading ? (
+            <div className="flex flex-col items-center justify-center text-center">
+              <Loader2 className="w-8 h-8 text-primary animate-spin" />
+              <p className="text-sm text-muted-foreground mt-2">Extracting name...</p>
+            </div>
+          ) : file ? (
+            <div className="flex items-center w-full h-full p-2 text-sm">
+                <div className="flex items-center gap-2 overflow-hidden flex-1">
+                {fieldName === 'frontOfContainer' ? <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0" /> : <FileText className="h-5 w-5 text-blue-500 flex-shrink-0" />}
+                <div className="truncate">
+                    <p className="font-semibold truncate" title={file.name}>{file.name}</p>
+                    <p className="text-xs text-muted-foreground">
+                    {(file.size / 1024).toFixed(2)} KB
+                    </p>
+                </div>
+                </div>
+                <button type="button" onClick={handleClearFile} className="ml-2 p-1 text-muted-foreground hover:text-destructive rounded-full absolute top-1 right-1">
+                    <X className="h-4 w-4" />
+                </button>
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center h-full text-center">
+              <UploadCloud className="w-8 h-8 text-gray-400" />
+              <p className="text-sm text-muted-foreground">Click to upload or drag & drop</p>
+            </div>
+          )}
           <input
             type="file"
             ref={fileInputRef}
             className="hidden"
             accept="image/*"
             onChange={handleFileChange}
+            disabled={isLoading}
           />
         </div>
       </div>
@@ -120,8 +192,15 @@ export function AddSupplementForm({ onAddSupplement }: { onAddSupplement: (data:
           )}
         />
 
-        <Button type="submit" disabled={!supplementNameValue} className="w-full">
-          Add Supplement
+        <Button type="submit" disabled={!supplementNameValue || isExtracting} className="w-full">
+          {isExtracting ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Processing...
+            </>
+          ) : (
+            "Add Supplement"
+          )}
         </Button>
       </form>
     </Form>
